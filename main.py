@@ -2,6 +2,8 @@ import json
 import time
 import tkinter as tk
 
+# Variables
+countdown_time = 3 # SECONDS ONLY
 
 class KeyCounter(tk.Tk):
     def __init__(self):
@@ -14,7 +16,7 @@ class KeyCounter(tk.Tk):
         self.start_time = None
         self.clicks_per_second = []
 
-        self.bpm_label = tk.Label(self, text="", font=("Arial", 12))
+        self.bpm_label = tk.Label(self, text=f"\n", font=("Arial", 12))
         self.bpm_label.pack()
 
         self.label = tk.Label(self, text="Press 'z' or 'x' to count\nPress Enter to start timer", font=("Arial", 14))
@@ -53,7 +55,7 @@ class KeyCounter(tk.Tk):
             self.timer_running = True
             self.start_time = time.time()
             self.label.config(text="Timer started! Press 'z' or 'x' to count")
-            self.after(5000, self.stop_timer)  # 5000 ms = 5 seconds
+            self.after(countdown_time * 1000, self.stop_timer)
 
     def get_current_datetime(self):
         # Return current date and time formatted as "YYYY-MM-DD | HH:MM:SS"
@@ -91,11 +93,25 @@ class KeyCounter(tk.Tk):
         # Write updated data to JSON file
         with open("countData.json", "w") as file:
             json.dump(existing_data, file, indent=4)  # Write JSON data with indentation for readability
-
-        if bpm >= 1000:
-            self.bpm_label.config(text=f"BPM: {bpm:.2f}")
-        else:
-            self.bpm_label.config(text=f"BPM: {bpm:.2f}")
+        try:
+            if bpm >= 1500:
+                raise ValueError
+            elif bpm >= 1000:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nKYS")
+            elif bpm >= 700:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nPlease touch grass")
+            elif bpm >= 500:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nokay, {bpm:2f} is enough")
+            elif bpm >= 300:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nLike a peregrine falcon 🦅, Nice!")
+            elif bpm >= 200:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nVery good speed")
+            elif bpm >= 100:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}\nGet it higher!")
+            else:
+                self.bpm_label.config(text=f"BPM: {bpm:.2f}!\n")
+        except ValueError:
+            self.bpm_label.config(text=f"BPM: ValueError\n")
 
     def reset_counts(self):
         self.z_count = 0
