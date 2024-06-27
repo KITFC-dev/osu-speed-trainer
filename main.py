@@ -44,9 +44,11 @@ class KeyCounter(tk.Tk):
                 self.x_label.config(text=f"'x' count: {self.x_count}")
             self.total_label.config(text=f"total count: {self.z_count + self.x_count}")
 
-            # Calculate clicks per second
+            # Calculate the elapsed time since the timer started
             elapsed_time = time.time() - self.start_time
+            # Calculate the number of clicks per second by dividing the total count of 'z' and 'x' keys by the elapsed time
             clicks_per_second = (self.z_count + self.x_count) / elapsed_time
+            # Append the calculated clicks per second to the list of clicks_per_second
             self.clicks_per_second.append(clicks_per_second)
 
     def start_timer(self, event):
@@ -68,7 +70,7 @@ class KeyCounter(tk.Tk):
 
         # Calculate mean BPM
         mean_clicks_per_second = sum(self.clicks_per_second) / len(self.clicks_per_second)
-        bpm = mean_clicks_per_second * 15
+        bpm = mean_clicks_per_second * 14
 
         # Prepare data to write to JSON
         data = {
@@ -92,7 +94,7 @@ class KeyCounter(tk.Tk):
 
         # Write updated data to JSON file
         with open("countData.json", "w") as file:
-            json.dump(existing_data, file, indent=4)  # Write JSON data with indentation for readability
+            json.dump(existing_data, file, indent=4)
         try:
             if bpm >= 1500:
                 raise ValueError
@@ -119,7 +121,8 @@ class KeyCounter(tk.Tk):
         self.z_label.config(text=f"'z' count: {self.z_count}")
         self.x_label.config(text=f"'x' count: {self.x_count}")
         self.total_label.config(text=f"total count: {self.z_count + self.x_count}")
-
+        self.bpm_label.config(text=f"BPM:      ", font=("Arial", 12))
+        self.clicks_per_second.clear()
 
 if __name__ == "__main__":
     app = KeyCounter()
