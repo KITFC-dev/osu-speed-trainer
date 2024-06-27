@@ -1,6 +1,7 @@
 import json
 import time
 import tkinter as tk
+import os
 
 # Variables
 countdown_time = 3 # SECONDS ONLY
@@ -68,9 +69,17 @@ class KeyCounter(tk.Tk):
         self.label.config(text="Timer ended")
         self.total_label.pack()
 
+        # Write updated data to JSON file
+        os.makedirs(os.path.join(os.getenv('APPDATA'), "OSUspeedTrainer"), exist_ok=True)
+        path_to_data = os.path.join(os.getenv('APPDATA'), "OSUspeedTrainer", "countData.json")
+
         # Calculate mean BPM
-        mean_clicks_per_second = sum(self.clicks_per_second) / len(self.clicks_per_second)
-        bpm = mean_clicks_per_second * 14
+        if len(self.clicks_per_second) > 3:
+            mean_clicks_per_second = sum(self.clicks_per_second) / len(self.clicks_per_second)
+            bpm = mean_clicks_per_second * 14
+        else:
+            self.clicks_per_second.clear()
+            bpm = 0
 
         # Prepare data to write to JSON
         data = {
@@ -84,7 +93,7 @@ class KeyCounter(tk.Tk):
 
         # Read existing data from JSON file if it exists
         try:
-            with open("countData.json", "r") as file:
+            with open(path_to_data, "r") as file:
                 existing_data = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             existing_data = {}
@@ -92,8 +101,7 @@ class KeyCounter(tk.Tk):
         # Update existing data with new data
         existing_data.update(data)
 
-        # Write updated data to JSON file
-        with open("countData.json", "w") as file:
+        with open(path_to_data, "w") as file:
             json.dump(existing_data, file, indent=4)
         try:
             if bpm >= 1500:
